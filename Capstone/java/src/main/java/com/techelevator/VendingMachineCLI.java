@@ -1,4 +1,6 @@
 package com.techelevator;
+import java.io.FileNotFoundException;
+
 /**************************************************************************************************************************
 *  This is your Vending Machine Command Line Interface (CLI) class
 *
@@ -11,7 +13,7 @@ package com.techelevator;
 *  Your code vending machine related code should be placed in here
 ***************************************************************************************************************************/
 import com.techelevator.view.Menu;         // Gain access to Menu class provided for the Capstone
-
+import java.util.*;
 public class VendingMachineCLI {
 
     // Main menu options defined as constants
@@ -40,11 +42,12 @@ public class VendingMachineCLI {
 	*  should be coded
 	*
 	*  Methods should be defined following run() method and invoked from it
+	 * @throws FileNotFoundException 
 	*
 	***************************************************************************************************************************/
 
-	public void run() {
-
+	public void run() throws FileNotFoundException {
+		 VendingMachine mainMachine = new VendingMachine();
 		boolean shouldProcess = true;         // Loop control variable
 		
 		while(shouldProcess) {                // Loop until user indicates they want to exit
@@ -54,7 +57,7 @@ public class VendingMachineCLI {
 			switch(choice) {                  // Process based on user menu choice
 			
 				case MAIN_MENU_OPTION_DISPLAY_ITEMS:
-					displayItems();           // invoke method to display items in Vending Machine
+					displayItems(mainMachine);           // invoke method to display items in Vending Machine
 					break;                    // Exit switch statement
 			
 				case MAIN_MENU_OPTION_PURCHASE:
@@ -64,7 +67,7 @@ public class VendingMachineCLI {
 				case MAIN_MENU_OPTION_EXIT:
 					endMethodProcessing();    // Invoke method to perform end of method processing
 					shouldProcess = false;    // Set variable to end loop
-					break;                    // Exit switch statement
+					break;                  // Exit switch statement
 			}	
 		}
 		return;                               // End method and return to caller
@@ -72,7 +75,24 @@ public class VendingMachineCLI {
 /********************************************************************************************************
  * Methods used to perform processing
  ********************************************************************************************************/
-	public void displayItems() {      // static attribute used as method is not associated with specific object instance
+	public void displayItems(VendingMachine mainMachine){ 
+	    List<Slot> slots = mainMachine.getSlots();
+		for (int i = 0; i < slots.size(); i++) {
+		     Slot singleSlot = slots.get(i);
+		    Product aProduct = singleSlot.getProduct();
+		    double aPrice = aProduct.getProductPrice();
+		    String aName = aProduct.getProductName();
+		    int aAmount  = singleSlot.getProductAmount();
+		    String aSlotValue = singleSlot.getSlotValue();
+		   if (aAmount == 0) {
+			   System.out.println(aSlotValue + " " + aName + " SOLD OUT");
+		   
+		   }
+		   else {
+		     System.out.println(aSlotValue + " " + aName + " $" + aPrice +", " + aAmount);
+		   }
+		}
+		// static attribute used as method is not associated with specific object instance
 		// Code to display items in Vending Machine
 	}
 	
