@@ -22,4 +22,8 @@ public class Slot {
 	public int getProductAmount() {
 		return productAmount;
 	}
+	
+	public void setProductAmount(int productAmount) {
+		this.productAmount = productAmount;
+	}
 }

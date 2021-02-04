@@ -43,6 +43,10 @@ public class VendingMachine {
 		return balance;
 	}
 
+	public void setBalance(double balance) {
+		this.balance = balance;
+	}
+
 	public List<Slot> getSlots() {
 		return slots;
 	}

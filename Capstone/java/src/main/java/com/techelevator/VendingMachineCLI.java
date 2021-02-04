@@ -26,6 +26,15 @@ public class VendingMachineCLI {
 													    MAIN_MENU_OPTION_EXIT
 													    };
 	
+	private static final String PURCHASE_MENU_OPTION_FEED_MONEY = "Feed Money";
+	private static final String PURCHASE_MENU_OPTION_SELECT_PRODUCT = "Select Product";
+	private static final String PURCHASE_MENU_OPTION_FINISH = "Finish Transaction";
+	private static final String[] PURCHASE_MENU_OPTIONS = { PURCHASE_MENU_OPTION_FEED_MONEY,
+															PURCHASE_MENU_OPTION_SELECT_PRODUCT,
+															PURCHASE_MENU_OPTION_FINISH
+													    	};
+	
+	
 	private Menu vendingMenu;              // Menu object to be used by an instance of this class
 	
 	public VendingMachineCLI(Menu menu) {  // Constructor - user will pas a menu for this class to use
@@ -47,7 +56,7 @@ public class VendingMachineCLI {
 	***************************************************************************************************************************/
 
 	public void run() throws FileNotFoundException {
-		 VendingMachine mainMachine = new VendingMachine();
+		VendingMachine mainMachine = new VendingMachine();
 		boolean shouldProcess = true;         // Loop control variable
 		
 		while(shouldProcess) {                // Loop until user indicates they want to exit
@@ -61,7 +70,8 @@ public class VendingMachineCLI {
 					break;                    // Exit switch statement
 			
 				case MAIN_MENU_OPTION_PURCHASE:
-					purchaseItems();          // invoke method to purchase items from Vending Machine
+					purchaseMenu(mainMachine);
+//					purchaseItems();          // invoke method to purchase items from Vending Machine
 					break;                    // Exit switch statement
 			
 				case MAIN_MENU_OPTION_EXIT:
@@ -78,15 +88,14 @@ public class VendingMachineCLI {
 	public void displayItems(VendingMachine mainMachine){ 
 	    List<Slot> slots = mainMachine.getSlots();
 		for (int i = 0; i < slots.size(); i++) {
-		     Slot singleSlot = slots.get(i);
+			Slot singleSlot = slots.get(i);
 		    Product aProduct = singleSlot.getProduct();
 		    double aPrice = aProduct.getProductPrice();
 		    String aName = aProduct.getProductName();
 		    int aAmount  = singleSlot.getProductAmount();
 		    String aSlotValue = singleSlot.getSlotValue();
-		   if (aAmount == 0) {
-			   System.out.println(aSlotValue + " " + aName + " SOLD OUT");
-		   
+		    if (aAmount == 0) {
+		    	System.out.println(aSlotValue + " " + aName + " SOLD OUT");
 		   }
 		   else {
 		     System.out.println(aSlotValue + " " + aName + " $" + aPrice +", " + aAmount);
@@ -95,6 +104,84 @@ public class VendingMachineCLI {
 		// static attribute used as method is not associated with specific object instance
 		// Code to display items in Vending Machine
 	}
+	
+	public void purchaseMenu(VendingMachine mainMachine) {
+
+		boolean shouldProcess = true;         // Loop control variable
+		
+		while(shouldProcess) {                // Loop until user indicates they want to exit
+			
+			System.out.println("\nCurrent Balance: " + mainMachine.getBalance());
+			
+			String choice = (String)vendingMenu.getChoiceFromOptions(PURCHASE_MENU_OPTIONS);  // Display menu and get choice
+			
+			Scanner userInput = new Scanner(System.in);
+			
+			switch(choice) {                  // Process based on user menu choice
+			
+				case PURCHASE_MENU_OPTION_FEED_MONEY:
+					System.out.print("How much money do you want to add? (1, 2, 5, or 10 dollars): ");
+					String userWantedAmount = userInput.nextLine();
+					int userWantedDollarAmt = Integer.parseInt(userWantedAmount);
+					
+					while (userWantedDollarAmt != 1 && userWantedDollarAmt != 2 &&
+						userWantedDollarAmt != 5 && userWantedDollarAmt != 10) {
+						System.out.println("Please a select a dollar amount that matches a bill: ");
+						userWantedDollarAmt = Integer.parseInt(userInput.nextLine());
+					}
+					double newBalance = mainMachine.getBalance() + userWantedDollarAmt;
+					mainMachine.setBalance(newBalance);
+					break;                    // Exit switch statement
+			
+				case PURCHASE_MENU_OPTION_SELECT_PRODUCT:
+					displayItems(mainMachine);
+					System.out.print("Please select an item code above to purchase: ");
+					String userWantedCode = userInput.nextLine();
+					
+					for (Slot singleSlot : mainMachine.getSlots()) {
+						if (singleSlot.getSlotValue().equals(userWantedCode.toUpperCase())) {
+							Product theProduct = singleSlot.getProduct();
+							if (mainMachine.getBalance() >= theProduct.getProductPrice() && 
+								singleSlot.getProductAmount() > 0) {
+								String productName = theProduct.getProductName();
+								double productCost = theProduct.getProductPrice();
+								double updatedBalance = mainMachine.getBalance() - productCost;
+								mainMachine.setBalance(updatedBalance);
+								
+								System.out.println("Purchased: " + productName +", Cost: " + productCost + ", New Balance: " + mainMachine.getBalance());
+								
+								String theProductType = theProduct.getItemType();
+								
+								if (theProductType.equals("Chip")) {
+									System.out.println("Crunch Crunch, Yum!");
+								} else if (theProductType.equals("Candy")) {
+									System.out.println("Munch Munch, Yum!");
+								} else if (theProductType.equals("Drink")) {
+									System.out.println("Glug Glug, Yum!");
+								} else if (theProductType.equals("Gum")) {
+									System.out.println("Chew Chew, Yum!");
+								}
+								
+								singleSlot.setProductAmount(singleSlot.getProductAmount() - 1);
+								break;
+							} else if (singleSlot.getProductAmount() == 0) {
+								System.out.println("Sorry, item is out of stock!");
+								break;
+							}
+						}
+					}
+					userInput.close();
+					break;                    // Exit switch statement
+			
+				case PURCHASE_MENU_OPTION_FINISH:
+					endMethodProcessing();    // Invoke method to perform end of method processing
+					shouldProcess = false;    // Set variable to end loop
+					break;                  // Exit switch statement
+			}	
+		}
+		return;                               // End method and return to caller
+	}
+	
 	
 	public void purchaseItems() {	 // static attribute used as method is not associated with specific object instance
 		// Code to purchase items from Vending Machine
