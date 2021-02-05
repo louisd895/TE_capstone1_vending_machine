@@ -70,7 +70,6 @@ public class VendingMachineCLI {
 			
 				case MAIN_MENU_OPTION_PURCHASE:
 					purchaseMenu(mainMachine);
-//					purchaseItems();          // invoke method to purchase items from Vending Machine
 					break;                    // Exit switch statement
 			
 				case MAIN_MENU_OPTION_EXIT:
@@ -112,19 +111,22 @@ public class VendingMachineCLI {
 		while(shouldProcess) {
 			
 			System.out.println("\nCurrent Balance: ");
-			System.out.printf("%.2f\n",mainMachine.getBalance());
+			System.out.printf("%.2f",mainMachine.getBalance());
 			
 			String choice = (String)vendingMenu.getChoiceFromOptions(PURCHASE_MENU_OPTIONS);
 			
 			switch(choice) {
 			
 				case PURCHASE_MENU_OPTION_FEED_MONEY:
-					System.out.print("How much money do you want to add? (1, 2, 5, or 10 dollars): ");
+					System.out.println("Please input a bill to add to the balance: ");
+					System.out.println("$(1, 2, 5, 10, 20, 50, 100)");
 					String userWantedAmount = userInput.nextLine();
 					int userWantedDollarAmt = Integer.parseInt(userWantedAmount);
 					
 					while (userWantedDollarAmt != 1 && userWantedDollarAmt != 2 &&
-						userWantedDollarAmt != 5 && userWantedDollarAmt != 10) {
+						userWantedDollarAmt != 5 && userWantedDollarAmt != 10 &&
+						userWantedDollarAmt != 20 && userWantedDollarAmt != 50 &&
+						userWantedDollarAmt != 100) {
 						System.out.println("Please a select a dollar amount that matches a bill: ");
 						userWantedDollarAmt = Integer.parseInt(userInput.nextLine());
 					}
