@@ -1,6 +1,11 @@
 package com.techelevator;
+import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.PrintWriter;
+import java.sql.Timestamp;
+import java.io.IOException;
 import java.text.DecimalFormat;
+import java.time.LocalDateTime;
 
 /**************************************************************************************************************************
 *  This is your Vending Machine Command Line Interface (CLI) class
@@ -51,12 +56,19 @@ public class VendingMachineCLI {
 	*  should be coded
 	*
 	*  Methods should be defined following run() method and invoked from it
-	 * @throws FileNotFoundException 
+	 * @throws IOException 
 	*
 	***************************************************************************************************************************/
 
-	public void run() throws FileNotFoundException {
+	public void run() throws IOException {
 		VendingMachine mainMachine = new VendingMachine();
+		File logFile = new File("Log.txt");
+		if (!logFile.exists() || !logFile.isFile()) {
+			logFile.createNewFile();
+		}
+		PrintWriter logExport = new PrintWriter(logFile);
+		logExport.print("Hello");
+		
 		boolean shouldProcess = true;         // Loop control variable
 		
 		while(shouldProcess) {                // Loop until user indicates they want to exit
@@ -70,7 +82,7 @@ public class VendingMachineCLI {
 					break;                    // Exit switch statement
 			
 				case MAIN_MENU_OPTION_PURCHASE:
-					purchaseMenu(mainMachine);
+					purchaseMenu(mainMachine, logExport);
 					break;                    // Exit switch statement
 			
 				case MAIN_MENU_OPTION_EXIT:
@@ -104,8 +116,9 @@ public class VendingMachineCLI {
 		// Code to display items in Vending Machine
 	}
 	
-	public void purchaseMenu(VendingMachine mainMachine) {
+	public void purchaseMenu(VendingMachine mainMachine, PrintWriter logExport) {
 
+		
 		boolean shouldProcess = true;
 		Scanner userInput = new Scanner(System.in);
 		
@@ -130,8 +143,10 @@ public class VendingMachineCLI {
 						userWantedDollarAmt != 100) {
 						System.out.println("Please a select a dollar amount that matches a bill: ");
 						userWantedDollarAmt = Integer.parseInt(userInput.nextLine());
-					}
+					}				
 					double newBalance = mainMachine.getBalance() + userWantedDollarAmt;
+					logExport.print("Hello");
+					logExport.println(Timestamp.valueOf(LocalDateTime.now()) + " FEED MONEY: " + userWantedDollarAmt + " " + mainMachine.getBalance());
 					mainMachine.setBalance(newBalance);
 					break;
 			
