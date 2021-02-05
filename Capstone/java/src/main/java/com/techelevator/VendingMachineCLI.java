@@ -1,5 +1,6 @@
 package com.techelevator;
 import java.io.FileNotFoundException;
+import java.text.DecimalFormat;
 
 /**************************************************************************************************************************
 *  This is your Vending Machine Command Line Interface (CLI) class
@@ -73,7 +74,7 @@ public class VendingMachineCLI {
 					break;                    // Exit switch statement
 			
 				case MAIN_MENU_OPTION_EXIT:
-					endMethodProcessing();    // Invoke method to perform end of method processing
+					endMethodProcessing(mainMachine);    // Invoke method to perform end of method processing
 					shouldProcess = false;    // Set variable to end loop
 					break;                  // Exit switch statement
 			}	
@@ -176,17 +177,21 @@ public class VendingMachineCLI {
 								System.out.println("Sorry, please add more to the balance to purchase the item!");
 								break;
 							}
+							  
 						}
+					}
+					if (doesProductExist == false) {
+						System.out.println("Sorry this item can not be found. ");
 					}
 					break;                    
 			
 				case PURCHASE_MENU_OPTION_FINISH:
-					endMethodProcessing();
+					endMethodProcessing(mainMachine);
 					shouldProcess = false;
 					break;  
 			}
 		}
-		userInput.close();
+		//userInput.close();
 		return;
 	}
 	
@@ -194,7 +199,41 @@ public class VendingMachineCLI {
 		// Code to purchase items from Vending Machine
 	}
 	
-	public void endMethodProcessing() { // static attribute used as method is not associated with specific object instance
+	public void endMethodProcessing(VendingMachine mainMachine) { // static attribute used as method is not associated with specific object instance
 		// Any processing that needs to be done before method ends
+		// set nicks, dimes, qrt 
+		//smallest coin count possible
+		DecimalFormat roundingFormat = new DecimalFormat("###.##");
+		
+		double roundedBalance = 0;
+		double currentBalance =  mainMachine.getBalance(); //current balance .80 
+	    double    nickel  = .05;
+	    double    dime= .10;
+	    double   quarter = .25;
+	    int nickelCount = 0;
+	    int dimeCount = 0;
+	    int quarterCount = 0;
+	    int coinCount = 0;
+	    
+	    coinCount = (int) (currentBalance / quarter);
+	    quarterCount = coinCount;
+	    currentBalance -= quarter * quarterCount;     //A2  48.55 bal 194 quater
+	    currentBalance = Double.parseDouble(roundingFormat.format(currentBalance));
+	    
+	    coinCount = (int) (currentBalance /dime);
+	    dimeCount = coinCount;
+	    currentBalance -= dime * dimeCount;
+	    currentBalance = Double.parseDouble(roundingFormat.format(currentBalance));
+	    
+	    coinCount = (int) (currentBalance / nickel);
+	    nickelCount = coinCount;
+	    currentBalance -= nickel * nickelCount;
+	    currentBalance = Double.parseDouble(roundingFormat.format(currentBalance));
+	    
+	    System.out.println("Your Change is " + quarterCount + " Quarters " + dimeCount + " Dimes " + nickelCount + " Nickels");
+	    mainMachine.setBalance(0);
+	    
+	
 	}
+	
 }
