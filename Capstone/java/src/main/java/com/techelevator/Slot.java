@@ -2,21 +2,21 @@ package com.techelevator;
 
 public class Slot {
 	private Product product;
-	private String slotValue;
+	private String slotCode;
 	private int productAmount;
 	
 	public Slot(Product product, int productAmount) {
 		this.product = product;
 		this.productAmount = productAmount;
-		slotValue = product.getSlotValue();
+		slotCode = product.getSlotCode();
 	}
 
 	public Product getProduct() {
 		return product;
 	}
 
-	public String getSlotValue() {
-		return slotValue;
+	public String getSlotCode() {
+		return slotCode;
 	}
 
 	public int getProductAmount() {

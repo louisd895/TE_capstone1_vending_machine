@@ -3,13 +3,13 @@ package com.techelevator;
 public class Product {
 	private String productName;
 	private Double productPrice;
-	private String slotValue;
+	private String slotCode;
 	private String itemType;
 	
-	public Product(String productName, Double productPrice, String slotValue, String itemType) {
+	public Product(String productName, Double productPrice, String slotCode, String itemType) {
 		this.productName = productName;
 		this.productPrice = productPrice;
-		this.slotValue = slotValue;
+		this.slotCode = slotCode;
 		this.itemType = itemType;
 	}
 
@@ -21,8 +21,8 @@ public class Product {
 		return productPrice;
 	}
 
-	public String getSlotValue() {
-		return slotValue;
+	public String getSlotCode() {
+		return slotCode;
 	}
 
 	public String getItemType() {
