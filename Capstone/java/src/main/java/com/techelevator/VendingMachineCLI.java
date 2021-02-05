@@ -1,7 +1,5 @@
 package com.techelevator;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.PrintWriter;
+import java.io.*;
 import java.sql.Timestamp;
 import java.io.IOException;
 import java.text.DecimalFormat;
@@ -62,12 +60,12 @@ public class VendingMachineCLI {
 
 	public void run() throws IOException {
 		VendingMachine mainMachine = new VendingMachine();
+		
 		File logFile = new File("Log.txt");
-		if (!logFile.exists() || !logFile.isFile()) {
+//		if (!logFile.exists() || !logFile.isFile()) {
 			logFile.createNewFile();
-		}
+//		}
 		PrintWriter logExport = new PrintWriter(logFile);
-		logExport.print("Hello");
 		
 		boolean shouldProcess = true;         // Loop control variable
 		
@@ -86,11 +84,11 @@ public class VendingMachineCLI {
 					break;                    // Exit switch statement
 			
 				case MAIN_MENU_OPTION_EXIT:
-					endMethodProcessing(mainMachine);    // Invoke method to perform end of method processing
 					shouldProcess = false;    // Set variable to end loop
 					break;                  // Exit switch statement
 			}	
 		}
+		logExport.close();
 		return;                               // End method and return to caller
 	}
 /********************************************************************************************************
@@ -126,7 +124,7 @@ public class VendingMachineCLI {
 			
 			System.out.println("\nCurrent Balance: ");
 			System.out.printf("%.2f",mainMachine.getBalance());
-			
+						
 			String choice = (String)vendingMenu.getChoiceFromOptions(PURCHASE_MENU_OPTIONS);
 			
 			switch(choice) {
@@ -135,19 +133,18 @@ public class VendingMachineCLI {
 					System.out.println("Please input a bill to add to the balance: ");
 					System.out.println("$(1, 2, 5, 10, 20, 50, 100)");
 					String userWantedAmount = userInput.nextLine();
-					int userWantedDollarAmt = Integer.parseInt(userWantedAmount);
+					double userWantedDollarAmt = Double.parseDouble(userWantedAmount);
 					
 					while (userWantedDollarAmt != 1 && userWantedDollarAmt != 2 &&
 						userWantedDollarAmt != 5 && userWantedDollarAmt != 10 &&
 						userWantedDollarAmt != 20 && userWantedDollarAmt != 50 &&
 						userWantedDollarAmt != 100) {
 						System.out.println("Please a select a dollar amount that matches a bill: ");
-						userWantedDollarAmt = Integer.parseInt(userInput.nextLine());
-					}				
+						userWantedDollarAmt = Double.parseDouble(userWantedAmount);
+					}
 					double newBalance = mainMachine.getBalance() + userWantedDollarAmt;
-					logExport.print("Hello");
-					logExport.println(Timestamp.valueOf(LocalDateTime.now()) + " FEED MONEY: " + userWantedDollarAmt + " " + mainMachine.getBalance());
 					mainMachine.setBalance(newBalance);
+					logExport.printf(Timestamp.valueOf(LocalDateTime.now()) + " FEED MONEY: $%.2f $%.2f", userWantedDollarAmt, mainMachine.getBalance());
 					break;
 			
 				case PURCHASE_MENU_OPTION_SELECT_PRODUCT:
@@ -192,7 +189,6 @@ public class VendingMachineCLI {
 								System.out.println("Sorry, please add more to the balance to purchase the item!");
 								break;
 							}
-							  
 						}
 					}
 					if (doesProductExist == false) {
@@ -206,12 +202,7 @@ public class VendingMachineCLI {
 					break;  
 			}
 		}
-		//userInput.close();
 		return;
-	}
-	
-	public void purchaseItems() {	 // static attribute used as method is not associated with specific object instance
-		// Code to purchase items from Vending Machine
 	}
 	
 	public void endMethodProcessing(VendingMachine mainMachine) { // static attribute used as method is not associated with specific object instance
@@ -220,7 +211,6 @@ public class VendingMachineCLI {
 		//smallest coin count possible
 		DecimalFormat roundingFormat = new DecimalFormat("###.##");
 		
-		double roundedBalance = 0;
 		double currentBalance =  mainMachine.getBalance(); //current balance .80 
 	    double    nickel  = .05;
 	    double    dime= .10;
