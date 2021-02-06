@@ -261,7 +261,31 @@ public class VendingMachineCLI {
 	    mainMachine.setBalance(0);
 	}
 	
-	public void createSalesReport(VendingMachine mainMachine) {
+	public void createSalesReport(VendingMachine mainMachine) throws IOException {
+		SimpleDateFormat sdFormat = new SimpleDateFormat("MM.dd.yyyy HH.mm.ss a");
+		Date date = new Date();
+		String logDate = sdFormat.format(date);
 		
+		File salesReportFile = new File(logDate + " Sales Report.txt");
+		salesReportFile.createNewFile();
+		
+		PrintWriter reportExport = new PrintWriter(salesReportFile);
+		
+		double totalSaleAmount = 0.00;
+		
+		 List<Slot> allMachineSlots = mainMachine.getSlots();
+		 for (Slot machineSlot : allMachineSlots) {
+			Product slotProduct  =  machineSlot.getProduct();
+			String productName =    slotProduct.getProductName();
+			double productPrice = slotProduct.getProductPrice();
+			
+			int amountSold = 5 - machineSlot.getProductAmount();
+			
+			totalSaleAmount += amountSold * productPrice;
+			
+			reportExport.println(productName + "|" + amountSold);
+		 }
+		 reportExport.printf("Total Sales: $%.2f", totalSaleAmount);
+		 reportExport.close();
 	}
 }
