@@ -1,9 +1,6 @@
 package com.techelevator;
 import java.io.*;
-import java.sql.Timestamp;
-import java.io.IOException;
-import java.text.DecimalFormat;
-import java.time.LocalDateTime;
+import java.text.*;
 
 /**************************************************************************************************************************
 *  This is your Vending Machine Command Line Interface (CLI) class
@@ -25,9 +22,11 @@ public class VendingMachineCLI {
 	private static final String MAIN_MENU_OPTION_DISPLAY_ITEMS = "Display Vending Machine Items";
 	private static final String MAIN_MENU_OPTION_PURCHASE      = "Purchase";
 	private static final String MAIN_MENU_OPTION_EXIT          = "Exit";
+	private static final String MAIN_MENU_OPTION_SALES_REPORT  = "Sales Report";
 	private static final String[] MAIN_MENU_OPTIONS = { MAIN_MENU_OPTION_DISPLAY_ITEMS,
 													    MAIN_MENU_OPTION_PURCHASE,
-													    MAIN_MENU_OPTION_EXIT
+													    MAIN_MENU_OPTION_EXIT,
+													    MAIN_MENU_OPTION_SALES_REPORT
 													    };
 	
 	private static final String PURCHASE_MENU_OPTION_FEED_MONEY = "Feed Money";
@@ -62,9 +61,8 @@ public class VendingMachineCLI {
 		VendingMachine mainMachine = new VendingMachine();
 		
 		File logFile = new File("Log.txt");
-//		if (!logFile.exists() || !logFile.isFile()) {
-			logFile.createNewFile();
-//		}
+		logFile.createNewFile();
+			
 		PrintWriter logExport = new PrintWriter(logFile);
 		
 		boolean shouldProcess = true;         // Loop control variable
@@ -86,6 +84,10 @@ public class VendingMachineCLI {
 				case MAIN_MENU_OPTION_EXIT:
 					shouldProcess = false;    // Set variable to end loop
 					break;                  // Exit switch statement
+					
+				case MAIN_MENU_OPTION_SALES_REPORT:
+					createSalesReport(mainMachine);
+					break;
 			}	
 		}
 		logExport.close();
@@ -115,10 +117,11 @@ public class VendingMachineCLI {
 	}
 	
 	public void purchaseMenu(VendingMachine mainMachine, PrintWriter logExport) {
-
 		
 		boolean shouldProcess = true;
 		Scanner userInput = new Scanner(System.in);
+		
+		SimpleDateFormat sdFormat = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss a");
 		
 		while(shouldProcess) {
 			
@@ -127,24 +130,30 @@ public class VendingMachineCLI {
 						
 			String choice = (String)vendingMenu.getChoiceFromOptions(PURCHASE_MENU_OPTIONS);
 			
+			Date date = new Date();
+			String logDate = sdFormat.format(date);
+			
 			switch(choice) {
 			
 				case PURCHASE_MENU_OPTION_FEED_MONEY:
 					System.out.println("Please input a bill to add to the balance: ");
 					System.out.println("$(1, 2, 5, 10, 20, 50, 100)");
 					String userWantedAmount = userInput.nextLine();
-					double userWantedDollarAmt = Double.parseDouble(userWantedAmount);
 					
-					while (userWantedDollarAmt != 1 && userWantedDollarAmt != 2 &&
-						userWantedDollarAmt != 5 && userWantedDollarAmt != 10 &&
-						userWantedDollarAmt != 20 && userWantedDollarAmt != 50 &&
-						userWantedDollarAmt != 100) {
+					while (!userWantedAmount.equals("1") && !userWantedAmount.equals("2") &&
+							!userWantedAmount.equals("5") && !userWantedAmount.equals("10") &&
+							!userWantedAmount.equals("20") && !userWantedAmount.equals("50") &&
+							!userWantedAmount.equals("100")) {
 						System.out.println("Please a select a dollar amount that matches a bill: ");
-						userWantedDollarAmt = Double.parseDouble(userWantedAmount);
+						userWantedAmount = userInput.nextLine();
 					}
+					double userWantedDollarAmt = Double.parseDouble(userWantedAmount);
 					double newBalance = mainMachine.getBalance() + userWantedDollarAmt;
 					mainMachine.setBalance(newBalance);
-					logExport.printf(Timestamp.valueOf(LocalDateTime.now()) + " FEED MONEY: $%.2f $%.2f", userWantedDollarAmt, mainMachine.getBalance());
+					
+					date = new Date();
+					logDate = sdFormat.format(date);
+					logExport.printf(logDate + " FEED MONEY: $%.2f $%.2f\n", userWantedDollarAmt, mainMachine.getBalance());
 					break;
 			
 				case PURCHASE_MENU_OPTION_SELECT_PRODUCT:
@@ -162,7 +171,13 @@ public class VendingMachineCLI {
 								singleSlot.getProductAmount() > 0) {
 								String productName = theProduct.getProductName();
 								double productCost = theProduct.getProductPrice();
+								String productCode = theProduct.getSlotCode();
 								double updatedBalance = mainMachine.getBalance() - productCost;
+								
+								date = new Date();
+								logDate = sdFormat.format(date);
+								logExport.printf(logDate + " " + productName + " " + productCode + " $%.2f $%.2f\n", mainMachine.getBalance(), updatedBalance);
+								
 								mainMachine.setBalance(updatedBalance);
 								
 								System.out.printf("Purchased: " + productName +", Cost: " + productCost + 
@@ -197,7 +212,7 @@ public class VendingMachineCLI {
 					break;                    
 			
 				case PURCHASE_MENU_OPTION_FINISH:
-					endMethodProcessing(mainMachine);
+					endPurchaseProcessing(mainMachine, logExport);
 					shouldProcess = false;
 					break;  
 			}
@@ -205,10 +220,11 @@ public class VendingMachineCLI {
 		return;
 	}
 	
-	public void endMethodProcessing(VendingMachine mainMachine) { // static attribute used as method is not associated with specific object instance
+	public void endPurchaseProcessing(VendingMachine mainMachine, PrintWriter logExport) { // static attribute used as method is not associated with specific object instance
 		// Any processing that needs to be done before method ends
 		// set nicks, dimes, qrt 
 		//smallest coin count possible
+		
 		DecimalFormat roundingFormat = new DecimalFormat("###.##");
 		
 		double currentBalance =  mainMachine.getBalance(); //current balance .80 
@@ -236,9 +252,16 @@ public class VendingMachineCLI {
 	    currentBalance = Double.parseDouble(roundingFormat.format(currentBalance));
 	    
 	    System.out.println("Your Change is " + quarterCount + " Quarters " + dimeCount + " Dimes " + nickelCount + " Nickels");
-	    mainMachine.setBalance(0);
 	    
-	
+	    SimpleDateFormat sdFormat = new SimpleDateFormat("MM/dd/yyyy HH:mm:ss a");
+		
+		Date date = new Date();
+		String logDate = sdFormat.format(date);
+		logExport.printf(logDate + " GIVE CHANGE: $%.2f $%.2f", mainMachine.getBalance(), 0.00);
+	    mainMachine.setBalance(0);
 	}
 	
+	public void createSalesReport(VendingMachine mainMachine) {
+		
+	}
 }
