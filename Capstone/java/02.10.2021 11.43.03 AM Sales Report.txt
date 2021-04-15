@@ -7,11 +7,11 @@ Cowtales|0
 Wonka Bar|0
 Crunchie|0
 Cola|0
-Dr. Salt|3
+Dr. Salt|0
 Mountain Melter|0
 Heavy|0
 U-Chews|0
-Little League Chew|0
+Little League Chew|1
 Chiclets|0
-Triplemint|0
-Total Sales: $4.50
+Triplemint|1
+Total Sales: $1.70
